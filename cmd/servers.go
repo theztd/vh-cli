@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"ztd/vh-cli/vashosting/servers"
 
 	"github.com/spf13/cobra"
 )
@@ -12,20 +13,30 @@ import (
 // serversCmd represents the servers command
 var serversCmd = &cobra.Command{
 	Use:   "servers",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Manage servers",
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println(cmd.Help())
 	},
 }
 
+var serversList = &cobra.Command{
+	Use:   "list",
+	Short: "List all servers",
+	Long:  ``,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("List all servers")
+		// clr := ""
+		for id, r := range servers.List() {
+			//fmt.Printf("%s - %+v\n", id, r)
+			fmt.Printf("%s: %s\n", id, PrettyPrint(r))
+
+		}
+	},
+}
+
 func init() {
-	//serversCmd.AddCommand(serversListCmd)
+	serversCmd.AddCommand(serversList)
 	rootCmd.AddCommand(serversCmd)
 
 	// Here you will define your flags and configuration settings.

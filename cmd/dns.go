@@ -5,7 +5,7 @@ package cmd
 
 import (
 	"fmt"
-	"ztd/vh-cli/cmd/dns"
+	"ztd/vh-cli/vashosting/dns"
 
 	"github.com/spf13/cobra"
 )
@@ -21,7 +21,10 @@ var dnsList = &cobra.Command{
 		zone, _ := cmd.Flags().GetString("zone")
 		fmt.Println("dnsList called. Output format will be", outFmt)
 
-		dns.List(zone)
+		for id, r := range dns.List(zone) {
+			//fmt.Printf("%s - %+v\n", id, r)
+			fmt.Printf("%s: %s\n", id, PrettyPrint(r))
+		}
 	},
 }
 
@@ -35,6 +38,7 @@ var dnsCmd = &cobra.Command{
 }
 
 func init() {
+	dnsCmd.AddCommand(dnsList)
 	rootCmd.AddCommand(dnsCmd)
 
 	// Here you will define your flags and configuration settings.

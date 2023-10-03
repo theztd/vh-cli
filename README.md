@@ -12,7 +12,7 @@ Aplikace je napsana v jazyce GO, staci tedy jen stahnout vybuildenou binarku pro
 ## Autentizace
 
 ```bash
-export VH_API_KEY="Vygenerovany-Token"
+export VH_API_KEY="Tajny-Vygenerovany-Token"
 
 # Defaultni hodnota je nastavena, nemate-li vlastni domenu, neni potreba nic menit
 export VH_URL="https://centrum.vas-hosting.cz/api/v1/"
