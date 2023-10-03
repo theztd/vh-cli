@@ -35,10 +35,9 @@ VH_API_KEY=Vygenerovany-Token
 ```bash
 # Vypsani seznamu domen
 vh-cli dns list
-vh-cli dns zones
 
 # Vypsani obsahu zony
-vh-cli dns list -z fejk.net
+vh-cli dns records -z fejk.net
 
 # Vytvoreni zaznamu
 vh-cli dns add -z fejk.net -t TXT -n pokus1 -v "Hodnota zaznamu" -c "Komentar"
@@ -47,5 +46,18 @@ vh-cli dns add -z fejk.net -t TXT -n pokus1 -v "Hodnota zaznamu" -c "Komentar"
 vh-cli dns rm -z fejk.net -id ID_ZAZNAMU
 ```
 
+### Sprava SERVERU
 
+```bash
+# Vypis seznamu serveru
+vh-cli servers list
+
+# Vypis informaci ke konkretnimu serveru
+vh-cli servers list -n n1.fejk.net
+
+
+# Reboot serveru (vyzaduje nasledne potvrzeni)
+vh-cli servers reboot -n n1.fejk.net
+
+```
 

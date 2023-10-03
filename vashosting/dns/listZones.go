@@ -8,18 +8,10 @@ import (
 	"ztd/vh-cli/config"
 )
 
-type Record struct {
-	Name     string `json:"name"`
-	Type     string `json:"type"`
-	Content  string `json:"content"`
-	Priority int    `json:"priority"`
-	TTL      int    `json:"ttl"`
-}
-
-func List(zone string) map[string]Record {
+func ListZones(zone string) map[string]interface{} {
 	/*
 		curl -H "X-API-Key: TOKEN" -XGET \
-			https://centrum.vas-hosting.cz/api/v1/domains/example.net/dns-records | jq
+			https://centrum.vas-hosting.cz/api/v1/domains/example.net | jq
 
 		>>>
 		{
@@ -39,10 +31,10 @@ func List(zone string) map[string]Record {
 	// 	// nebyl zadan nazev zony, listuji tedy zony
 	// }
 	TOKEN := config.CFG["VH_API_KEY"]
-	URL := fmt.Sprintf("%s/domains/%s/dns-records", config.CFG["VH_URL"], zone)
+	URL := fmt.Sprintf("%s/domains/%s", config.CFG["VH_URL"], zone)
 	req, err := http.NewRequest(
 		http.MethodGet,
-		fmt.Sprintf(URL),
+		URL,
 		nil,
 	)
 	if err != nil {
@@ -63,11 +55,10 @@ func List(zone string) map[string]Record {
 
 	if res.StatusCode != 200 {
 		fmt.Println("ERR: Bad request!", URL)
-		return map[string]Record{}
+		return map[string]interface{}{}
 	}
 
-	//var data map[string]interface{}
-	var data map[string]Record
+	var data map[string]interface{}
 	if err := json.Unmarshal(body, &data); err != nil {
 		panic(err)
 	}

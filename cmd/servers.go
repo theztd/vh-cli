@@ -26,8 +26,9 @@ var serversList = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("List all servers")
+		name, _ := cmd.Flags().GetString("name")
 		// clr := ""
-		for id, r := range servers.List() {
+		for id, r := range servers.List(name) {
 			//fmt.Printf("%s - %+v\n", id, r)
 			fmt.Printf("%s: %s\n", id, PrettyPrint(r))
 
@@ -43,7 +44,7 @@ func init() {
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// serversCmd.PersistentFlags().String("foo", "", "A help for foo")
+	serversCmd.PersistentFlags().StringP("name", "n", "", "Server name")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:

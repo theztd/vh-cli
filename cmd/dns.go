@@ -10,18 +10,54 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var dnsList = &cobra.Command{
+var dnsListZones = &cobra.Command{
 	Use:   "list",
-	Short: "List zaznamu v domene",
+	Short: "Vypis domen",
 	Long: `
 	
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
-		outFmt, _ := cmd.Flags().GetString("out")
+		//outFmt, _ := cmd.Flags().GetString("out")
 		zone, _ := cmd.Flags().GetString("zone")
-		fmt.Println("dnsList called. Output format will be", outFmt)
 
-		for id, r := range dns.List(zone) {
+		for id, r := range dns.ListZones(zone) {
+			//fmt.Printf("%s - %+v\n", id, r)
+			fmt.Printf("%s: %s\n", id, PrettyPrint(r))
+		}
+	},
+}
+
+var dnsListRecords = &cobra.Command{
+	Use:   "records",
+	Short: "Vypis zaznamu v domene",
+	Long: `
+	
+	`,
+	Run: func(cmd *cobra.Command, args []string) {
+		//outFmt, _ := cmd.Flags().GetString("out")
+		zone, _ := cmd.Flags().GetString("zone")
+
+		for id, r := range dns.ListRecords(zone) {
+			//fmt.Printf("%s - %+v\n", id, r)
+			fmt.Printf("%s: %s\n", id, PrettyPrint(r))
+		}
+	},
+}
+
+var dnsAddRecord = &cobra.Command{
+	Use:   "record-add",
+	Short: "Prida zaznam do domeny",
+	Long: `Zapis neni okamzity!!!
+
+Novy zaznam v DNS se muze objevit az po 15minutach
+	`,
+	Run: func(cmd *cobra.Command, args []string) {
+		//outFmt, _ := cmd.Flags().GetString("out")
+		zone, _ := cmd.Flags().GetString("zone")
+
+		fmt.Println(cmd.Help())
+
+		for id, r := range dns.ListRecords(zone) {
 			//fmt.Printf("%s - %+v\n", id, r)
 			fmt.Printf("%s: %s\n", id, PrettyPrint(r))
 		}
@@ -38,7 +74,7 @@ var dnsCmd = &cobra.Command{
 }
 
 func init() {
-	dnsCmd.AddCommand(dnsList)
+	dnsCmd.AddCommand(dnsListRecords, dnsListZones, dnsAddRecord)
 	rootCmd.AddCommand(dnsCmd)
 
 	// Here you will define your flags and configuration settings.
