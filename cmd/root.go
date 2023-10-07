@@ -4,27 +4,26 @@ Copyright © 2023 Marek Sirovy
 package cmd
 
 import (
+	"fmt"
 	"os"
+	"ztd/vh-cli/vashosting"
 
 	"github.com/spf13/cobra"
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "vh-cli",
-	Short: "Vas-Hosting CLI client",
-	Long: `        
-            Vas Hosting
-        ==================
-
-                 ▅▅
-               ▅▅▅▅▅▅
-                ▅▅▅▅
-                 ▅▅
-
+	Use:     "vh-cli",
+	Version: vashosting.VERSION,
+	Short:   "Vas-Hosting CLI client",
+	Long: fmt.Sprintf(`                           
+             ▅▅        
+           ▅▅▅▅▅▅          Vas Hosting
+            ▅▅▅▅           (%s)
+             ▅▅
 
 🌎 Command Line Interface pro komunikaci s Vas Hosting API
-	`,
+	`, vashosting.VERSION),
 }
 
 func Execute() {

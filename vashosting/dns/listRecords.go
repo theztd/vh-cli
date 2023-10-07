@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"ztd/vh-cli/config"
 )
 
@@ -16,7 +17,7 @@ type Record struct {
 	TTL      int    `json:"ttl"`
 }
 
-func ListRecords(zone string) map[string]Record {
+func ListRecords(zone string, record Record) map[string]Record {
 	/*
 		curl -H "X-API-Key: TOKEN" -XGET \
 			https://centrum.vas-hosting.cz/api/v1/domains/example.net/dns-records | jq
@@ -70,6 +71,22 @@ func ListRecords(zone string) map[string]Record {
 	var data map[string]Record
 	if err := json.Unmarshal(body, &data); err != nil {
 		panic(err)
+	}
+
+	// Filter
+	if record.Name != "" {
+		ret := map[string]Record{}
+
+		for id, r := range data {
+			// strings.ToLower(r.Type) == strings.ToLower(record.Type) &&
+			if strings.ToLower(r.Type) == strings.ToLower(record.Type) && strings.Contains(r.Name, record.Name) {
+				fmt.Println(r.Name)
+				ret[id] = r
+			}
+
+		}
+
+		return ret
 	}
 
 	return data

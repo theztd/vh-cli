@@ -12,24 +12,39 @@ import (
 
 // serversCmd represents the servers command
 var serversCmd = &cobra.Command{
-	Use:   "servers",
-	Short: "Manage servers",
-	Long:  ``,
+	Use:     "servers",
+	Aliases: []string{"server", "srv", "s"},
+	Short:   "Manage servers",
+	Long:    ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println(cmd.Help())
 	},
 }
 
 var serversList = &cobra.Command{
-	Use:   "list",
-	Short: "List all servers",
-	Long:  ``,
+	Use:     "list",
+	Aliases: []string{"l"},
+	Short:   "List all servers",
+	Long:    ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("List all servers")
 		name, _ := cmd.Flags().GetString("name")
 		// clr := ""
 		for id, r := range servers.List(name) {
 			//fmt.Printf("%s - %+v\n", id, r)
+			// var clr string
+			// status := r["status"].(string)
+			// switch status {
+			// case "A":
+			// 	clr = color.Blue
+			// case "CNAME":
+			// 	clr = color.Green
+			// case "TXT":
+			// 	clr = color.Yellow
+
+			// }
+			// fmt.Printf("%sID: %s - %+v %s\n", clr, id, r, color.Reset)
+
 			fmt.Printf("%s: %s\n", id, PrettyPrint(r))
 
 		}

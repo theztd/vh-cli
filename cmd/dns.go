@@ -4,40 +4,35 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"ztd/vh-cli/vashosting/dns"
 
 	"github.com/spf13/cobra"
 )
 
-var dnsListZones = &cobra.Command{
-	Use:   "list",
-	Short: "Vypis domen",
-	Long: `
-	
-	`,
-	Run: func(cmd *cobra.Command, args []string) {
-		//outFmt, _ := cmd.Flags().GetString("out")
-		zone, _ := cmd.Flags().GetString("zone")
-
-		for id, r := range dns.ListZones(zone) {
-			//fmt.Printf("%s - %+v\n", id, r)
-			fmt.Printf("%s: %s\n", id, PrettyPrint(r))
-		}
-	},
-}
-
 var dnsListRecords = &cobra.Command{
-	Use:   "records",
-	Short: "Vypis zaznamu v domene",
+	Use:     "list",
+	Aliases: []string{"l"},
+	Short:   "Vypis zaznamu v domene",
 	Long: `
 	
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		//outFmt, _ := cmd.Flags().GetString("out")
 		zone, _ := cmd.Flags().GetString("zone")
-
-		for id, r := range dns.ListRecords(zone) {
+		name, _ := cmd.Flags().GetString("name")
+		kind, _ := cmd.Flags().GetString("type")
+		ttl, _ := cmd.Flags().GetInt("ttl")
+		value, _ := cmd.Flags().GetString("value")
+		rec := dns.Record{
+			Name:    name,
+			Type:    kind,
+			TTL:     ttl,
+			Content: value,
+		}
+		for id, r := range dns.ListRecords(zone, rec) {
 			//fmt.Printf("%s - %+v\n", id, r)
 			fmt.Printf("%s: %s\n", id, PrettyPrint(r))
 		}
@@ -45,8 +40,9 @@ var dnsListRecords = &cobra.Command{
 }
 
 var dnsAddRecord = &cobra.Command{
-	Use:   "record-add",
-	Short: "Prida zaznam do domeny",
+	Use:     "add",
+	Aliases: []string{"a"},
+	Short:   "Prida zaznam do domeny",
 	Long: `Zapis neni okamzity!!!
 
 Novy zaznam v DNS se muze objevit az po 15minutach
@@ -54,12 +50,72 @@ Novy zaznam v DNS se muze objevit az po 15minutach
 	Run: func(cmd *cobra.Command, args []string) {
 		//outFmt, _ := cmd.Flags().GetString("out")
 		zone, _ := cmd.Flags().GetString("zone")
+		name, _ := cmd.Flags().GetString("name")
+		kind, _ := cmd.Flags().GetString("type")
+		ttl, _ := cmd.Flags().GetInt("ttl")
+		value, _ := cmd.Flags().GetString("value")
+		rec := dns.Record{
+			Name:    name,
+			Type:    kind,
+			TTL:     ttl,
+			Content: value,
+		}
 
-		fmt.Println(cmd.Help())
+		status, body := dns.Add(zone, rec)
+		if status != 204 {
+			fmt.Println("ERR: StatusCode:", status)
+			fmt.Println("ERR: Response msg:", string(body))
+		}
+	},
+}
 
-		for id, r := range dns.ListRecords(zone) {
-			//fmt.Printf("%s - %+v\n", id, r)
-			fmt.Printf("%s: %s\n", id, PrettyPrint(r))
+var dnsDelRecord = &cobra.Command{
+	Use:     "del",
+	Aliases: []string{"rm"},
+	Short:   "Smaze zaznam z domeny",
+	Long: `Zmena neni okamzita!!!
+
+Novy zaznam z DNS muze zmizet az po 15minutach
+	`,
+	Run: func(cmd *cobra.Command, args []string) {
+		//outFmt, _ := cmd.Flags().GetString("out")
+		zone, _ := cmd.Flags().GetString("zone")
+		name, _ := cmd.Flags().GetString("name")
+		kind, _ := cmd.Flags().GetString("type")
+		ttl, _ := cmd.Flags().GetInt("ttl")
+		value, _ := cmd.Flags().GetString("value")
+		rec := dns.Record{
+			Name:    name,
+			Type:    kind,
+			TTL:     ttl,
+			Content: value,
+		}
+
+		recordsForDeleting := dns.ListRecords(zone, rec)
+
+		if len(recordsForDeleting) == 0 {
+			fmt.Println("Neni co mazat.")
+			return
+		}
+
+		fmt.Println("Chystate se smazat nasledujici zaznamy:")
+		for id, r := range recordsForDeleting {
+			fmt.Println(id, r)
+		}
+		buf := bufio.NewReader(os.Stdin)
+		fmt.Printf("Jste si tim jisty?\n(yes/no)> ")
+		confirm, _ := buf.ReadString('\n')
+		if confirm == "yes\n" {
+			for id, r := range recordsForDeleting {
+				status, body := dns.Del(zone, id, r)
+				if status != 204 {
+					fmt.Println("ERR: StatusCode:", status)
+					fmt.Println("ERR: Response msg:", string(body))
+				}
+			}
+
+		} else {
+			fmt.Println("Nic nemazu")
 		}
 	},
 }
@@ -67,14 +123,14 @@ Novy zaznam v DNS se muze objevit az po 15minutach
 // dnsCmd represents the dns command
 var dnsCmd = &cobra.Command{
 	Use:   "dns",
-	Short: "Sprava DNS",
+	Short: "Sprava DNS zaznamu",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println(cmd.Help())
 	},
 }
 
 func init() {
-	dnsCmd.AddCommand(dnsListRecords, dnsListZones, dnsAddRecord)
+	dnsCmd.AddCommand(dnsListRecords, dnsAddRecord, dnsDelRecord)
 	rootCmd.AddCommand(dnsCmd)
 
 	// Here you will define your flags and configuration settings.
@@ -83,6 +139,11 @@ func init() {
 	// and all subcommands, e.g.:
 	dnsCmd.PersistentFlags().StringP("zone", "z", "", "DNS zone name")
 	dnsCmd.PersistentFlags().StringP("out", "o", "", "Output format")
+	dnsCmd.PersistentFlags().StringP("name", "n", "", "DNS record name")
+	dnsCmd.PersistentFlags().StringP("type", "t", "TXT", "DNS record type")
+	dnsCmd.PersistentFlags().StringP("value", "v", "", "DNS record value")
+	dnsCmd.PersistentFlags().IntP("prio", "p", 0, "DNS record priority")
+	dnsCmd.PersistentFlags().IntP("ttl", "T", 86400, "DNS record TTL")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:

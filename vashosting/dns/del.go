@@ -9,7 +9,7 @@ import (
 	cmd "ztd/vh-cli/config"
 )
 
-func Add(zone string, record Record) (status int, body []byte) {
+func Del(zone string, id string, record Record) (status int, body []byte) {
 	/*
 		curl -H "X-API-Key: TOKEN" -XPOST \
 			'https://centrum.vas-hosting.cz/api/v1/domains/<domain>/dns-records' \
@@ -35,8 +35,8 @@ func Add(zone string, record Record) (status int, body []byte) {
 	}
 
 	req, err := http.NewRequest(
-		http.MethodPost,
-		fmt.Sprintf("https://centrum.vas-hosting.cz/api/v1/domains/%s/dns-records", zone),
+		http.MethodDelete,
+		fmt.Sprintf("https://centrum.vas-hosting.cz/api/v1/domains/%s/dns-records/%s", zone, id),
 		bytes.NewReader(jsonData),
 	)
 	if err != nil {
@@ -54,7 +54,5 @@ func Add(zone string, record Record) (status int, body []byte) {
 	if err != nil {
 		panic(err)
 	}
-
 	return res.StatusCode, body
-
 }

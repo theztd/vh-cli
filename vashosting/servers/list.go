@@ -27,9 +27,6 @@ func List(server string) map[string]interface{} {
 			...
 		}
 	*/
-	// if len(zone) < 1 {
-	// 	// nebyl zadan nazev zony, listuji tedy zony
-	// }
 	TOKEN := config.CFG["VH_API_KEY"]
 	URL := fmt.Sprintf("%s/servers/%s", config.CFG["VH_URL"], server)
 	req, err := http.NewRequest(

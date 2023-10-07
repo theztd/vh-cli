@@ -9,9 +9,17 @@ import (
 )
 
 var (
-	TOKEN string = config.CFG["VH_API_KEY"]
-	URL   string = config.CFG["VH_URL"]
+	TOKEN   string
+	URL     string
+	VERSION string
 )
+
+func init() {
+	// Add validation
+	VERSION = "0.0.2"
+	TOKEN = config.CFG["VH_API_KEY"]
+	URL = config.CFG["VH_URL"]
+}
 
 func Get(route string, method string) map[string]interface{} {
 	req, err := http.NewRequest(
