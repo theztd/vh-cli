@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	cmd "ztd/vh-cli/config"
+	"ztd/vh-cli/config"
 )
 
 func Del(zone string, id string, record Record) (status int, body []byte) {
@@ -27,7 +27,6 @@ func Del(zone string, id string, record Record) (status int, body []byte) {
 	// if len(zone) < 1 {
 	// 	// nebyl zadan nazev zony, listuji tedy zony
 	// }
-	TOKEN := cmd.CFG["VH_API_KEY"]
 	jsonData, err := json.Marshal(record)
 	if err != nil {
 
@@ -36,14 +35,14 @@ func Del(zone string, id string, record Record) (status int, body []byte) {
 
 	req, err := http.NewRequest(
 		http.MethodDelete,
-		fmt.Sprintf("https://centrum.vas-hosting.cz/api/v1/domains/%s/dns-records/%s", zone, id),
+		fmt.Sprintf("%s/domains/%s/dns-records/%s", config.VH_URL, zone, id),
 		bytes.NewReader(jsonData),
 	)
 	if err != nil {
 		panic(err)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-API-Key", TOKEN)
+	req.Header.Set("X-API-Key", config.VH_API_KEY)
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		fmt.Println("ERR [request]:", err)

@@ -36,11 +36,7 @@ func ListRecords(zone string, record Record) map[string]Record {
 			...
 		}
 	*/
-	// if len(zone) < 1 {
-	// 	// nebyl zadan nazev zony, listuji tedy zony
-	// }
-	TOKEN := config.CFG["VH_API_KEY"]
-	URL := fmt.Sprintf("%s/domains/%s/dns-records", config.CFG["VH_URL"], zone)
+	URL := fmt.Sprintf("%s/domains/%s/dns-records", config.VH_URL, zone)
 	req, err := http.NewRequest(
 		http.MethodGet,
 		URL,
@@ -50,7 +46,7 @@ func ListRecords(zone string, record Record) map[string]Record {
 		panic(err)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-API-Key", TOKEN)
+	req.Header.Set("X-API-Key", config.VH_API_KEY)
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		panic(err)
@@ -78,8 +74,7 @@ func ListRecords(zone string, record Record) map[string]Record {
 		ret := map[string]Record{}
 
 		for id, r := range data {
-			// strings.ToLower(r.Type) == strings.ToLower(record.Type) &&
-			if strings.ToLower(r.Type) == strings.ToLower(record.Type) && strings.Contains(r.Name, record.Name) {
+			if strings.EqualFold(record.Type, record.Type) && strings.Contains(r.Name, record.Name) {
 				fmt.Println(r.Name)
 				ret[id] = r
 			}

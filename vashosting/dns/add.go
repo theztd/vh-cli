@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	cmd "ztd/vh-cli/config"
+	"ztd/vh-cli/config"
 )
 
 func Add(zone string, record Record) (status int, body []byte) {
@@ -24,10 +24,7 @@ func Add(zone string, record Record) (status int, body []byte) {
 
 		>>>
 	*/
-	// if len(zone) < 1 {
-	// 	// nebyl zadan nazev zony, listuji tedy zony
-	// }
-	TOKEN := cmd.CFG["VH_API_KEY"]
+
 	jsonData, err := json.Marshal(record)
 	if err != nil {
 
@@ -36,14 +33,14 @@ func Add(zone string, record Record) (status int, body []byte) {
 
 	req, err := http.NewRequest(
 		http.MethodPost,
-		fmt.Sprintf("https://centrum.vas-hosting.cz/api/v1/domains/%s/dns-records", zone),
+		fmt.Sprintf("%s/domains/%s/dns-records", config.VH_URL, zone),
 		bytes.NewReader(jsonData),
 	)
 	if err != nil {
 		panic(err)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-API-Key", TOKEN)
+	req.Header.Set("X-API-Key", config.VH_API_KEY)
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		fmt.Println("ERR [request]:", err)

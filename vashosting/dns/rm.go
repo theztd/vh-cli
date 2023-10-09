@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"ztd/vh-cli/cmd/color"
-	cmd "ztd/vh-cli/config"
+	"ztd/vh-cli/config"
 )
 
 func Rm(zone string) {
@@ -24,18 +24,16 @@ func Rm(zone string) {
 
 		>>>
 	*/
-	TOKEN := cmd.CFG["VH_API_KEY"]
-	fmt.Println(TOKEN)
 	req, err := http.NewRequest(
 		http.MethodGet,
-		fmt.Sprintf("https://centrum.vas-hosting.cz/api/v1/domains/%s/dns-records", zone),
+		fmt.Sprintf("%s/domains/%s/dns-records", config.VH_URL, zone),
 		nil,
 	)
 	if err != nil {
 		panic(err)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-API-Key", TOKEN)
+	req.Header.Set("X-API-Key", config.VH_API_KEY)
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		panic(err)

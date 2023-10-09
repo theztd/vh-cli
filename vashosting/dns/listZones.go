@@ -30,8 +30,7 @@ func ListZones(zone string) map[string]interface{} {
 	// if len(zone) < 1 {
 	// 	// nebyl zadan nazev zony, listuji tedy zony
 	// }
-	TOKEN := config.CFG["VH_API_KEY"]
-	URL := fmt.Sprintf("%s/domains/%s", config.CFG["VH_URL"], zone)
+	URL := fmt.Sprintf("%s/domains/%s", config.VH_URL, zone)
 	req, err := http.NewRequest(
 		http.MethodGet,
 		URL,
@@ -41,7 +40,7 @@ func ListZones(zone string) map[string]interface{} {
 		panic(err)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-API-Key", TOKEN)
+	req.Header.Set("X-API-Key", config.VH_API_KEY)
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		panic(err)

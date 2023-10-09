@@ -27,8 +27,7 @@ func List(server string) map[string]interface{} {
 			...
 		}
 	*/
-	TOKEN := config.CFG["VH_API_KEY"]
-	URL := fmt.Sprintf("%s/servers/%s", config.CFG["VH_URL"], server)
+	URL := fmt.Sprintf("%s/servers/%s", config.VH_URL, server)
 	req, err := http.NewRequest(
 		http.MethodGet,
 		URL,
@@ -38,7 +37,7 @@ func List(server string) map[string]interface{} {
 		panic(err)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-API-Key", TOKEN)
+	req.Header.Set("X-API-Key", config.VH_API_KEY)
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		panic(err)
