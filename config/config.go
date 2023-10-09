@@ -27,18 +27,22 @@ func Init() {
 	// Nejdriv se zkusi vzit config z lokalni cesty
 	// a pokud neexistuje, vezme se ten z home
 	cfgFile := GetEnv(".vh/config.env", "~/.vh/config.env")
-	if cfg, err := godotenv.Read(cfgFile); err != nil {
-		fmt.Println("Fatal: Unable to read config file... ", cfgFile, err)
-		os.Exit(1)
-	} else {
-		// CFG = cfg
-		VH_API_KEY = GetEnv(cfg["VH_API_KEY"], "")
-		VH_URL = GetEnv(cfg["VH_URL"], "")
-		if defttl, err := strconv.Atoi(GetEnv(cfg["DEFAULT_TTL"], "86400")); err != nil {
+	if cfg, err := godotenv.Read(cfgFile); err == nil {
+		// Pokud je konfigurace v ENV, pouzij tu, jinak zkus config, pripadne pouzij default
+		VH_URL = GetEnv(os.Getenv("VH_URL"), GetEnv(cfg["VH_URL"], ""))
+		if defttl, err := strconv.Atoi(GetEnv(os.Getenv("DEFAULT_TTL"), GetEnv(cfg["DEFAULT_TTL"], "86400"))); err != nil {
 			fmt.Println("ERR [config]: Wrong config format DEFAULT_TTL")
 			panic(err)
 		} else {
 			DEFAULT_TTL = defttl
 		}
+		// API key nema default
+		VH_API_KEY = GetEnv(os.Getenv("VH_API_KEY"), cfg["VH_API_KEY"])
+
+	} else {
+		fmt.Println("Fatal: Unable to read config file... ", cfgFile, err)
+		os.Exit(1)
 	}
+
+	fmt.Println("Default TTL:", DEFAULT_TTL)
 }
