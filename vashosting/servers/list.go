@@ -3,7 +3,7 @@ package servers
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"ztd/vh-cli/config"
 )
@@ -44,7 +44,7 @@ func List(server string) map[string]interface{} {
 	}
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		panic(err)
 	}

@@ -29,21 +29,28 @@ VH_API_KEY=Vygenerovany-Token
 
 ## Pouziti
 
+### Automaticke doplnovani
 
+
+```bash
+# Ukazka na linuxu pro bash
+vh-cli completion bash > /etc/profile.d/vh-cli.sh
+
+```
 ### Sprava DNS
 
 ```bash
 # Vypsani seznamu domen
-vh-cli dns list
+vh-cli zone list
 
 # Vypsani obsahu zony
-vh-cli dns records -z fejk.net
+vh-cli dns list -z fejk.net
 
 # Vytvoreni zaznamu
 vh-cli dns add -z fejk.net -t TXT -n pokus1 -v "Hodnota zaznamu" -c "Komentar"
 
 # Smazani zaznamu
-vh-cli dns rm -z fejk.net -id ID_ZAZNAMU
+vh-cli dns del -z fejk.net -n nazev-zaznamu -t TXT
 ```
 
 ### Sprava SERVERU

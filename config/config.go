@@ -9,7 +9,6 @@ import (
 )
 
 var (
-	VERSION = "0.0.1-alfa"
 	// CFG     map[string]string
 	VH_API_KEY  string
 	VH_URL      string

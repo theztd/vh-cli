@@ -14,7 +14,7 @@ import (
 var serversCmd = &cobra.Command{
 	Use:     "servers",
 	Aliases: []string{"server", "srv", "s"},
-	Short:   "Manage servers",
+	Short:   "Sprava serveru",
 	Long:    ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println(cmd.Help())
@@ -24,10 +24,9 @@ var serversCmd = &cobra.Command{
 var serversList = &cobra.Command{
 	Use:     "list",
 	Aliases: []string{"l"},
-	Short:   "List all servers",
+	Short:   "Vypise seznam serveru",
 	Long:    ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("List all servers")
 		name, _ := cmd.Flags().GetString("name")
 		// clr := ""
 		for id, r := range servers.List(name) {
