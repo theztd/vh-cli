@@ -13,6 +13,7 @@ var (
 	VH_API_KEY  string
 	VH_URL      string
 	DEFAULT_TTL int
+	DEBUG       bool
 )
 
 func GetEnv(val string, def string) string {
@@ -29,6 +30,7 @@ func Init() {
 	if cfg, err := godotenv.Read(cfgFile); err == nil {
 		// Pokud je konfigurace v ENV, pouzij tu, jinak zkus config, pripadne pouzij default
 		VH_URL = GetEnv(os.Getenv("VH_URL"), GetEnv(cfg["VH_URL"], ""))
+		DEBUG, _ = strconv.ParseBool(GetEnv(os.Getenv("DEBUG"), GetEnv(cfg["DEBUG"], "false")))
 		if defttl, err := strconv.Atoi(GetEnv(os.Getenv("DEFAULT_TTL"), GetEnv(cfg["DEFAULT_TTL"], "86400"))); err != nil {
 			fmt.Println("ERR [config]: Wrong config format DEFAULT_TTL")
 			panic(err)
@@ -42,6 +44,4 @@ func Init() {
 		fmt.Println("Fatal: Unable to read config file... ", cfgFile, err)
 		os.Exit(1)
 	}
-
-	fmt.Println("Default TTL:", DEFAULT_TTL)
 }
