@@ -20,7 +20,7 @@ var dnsListRecords = &cobra.Command{
 	
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
-		//outFmt, _ := cmd.Flags().GetString("out")
+		outFmt, _ := cmd.Flags().GetString("out")
 		zone, _ := cmd.Flags().GetString("zone")
 		name, _ := cmd.Flags().GetString("name")
 		kind, _ := cmd.Flags().GetString("type")
@@ -33,8 +33,14 @@ var dnsListRecords = &cobra.Command{
 			Content: value,
 		}
 		for id, r := range dns.ListRecords(zone, rec) {
+
 			//fmt.Printf("%s - %+v\n", id, r)
-			fmt.Printf("%s: %s\n", id, PrettyPrint(r))
+			if outFmt == "csv" {
+				fmt.Printf("%s;%s;%s;%d;%s\n", id, r.Name, r.Type, r.TTL, r.Content)
+			} else {
+				fmt.Printf("%s: %s\n", id, PrettyPrint(r))
+			}
+
 		}
 	},
 }

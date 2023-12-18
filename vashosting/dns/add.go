@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"ztd/vh-cli/config"
 )
@@ -47,7 +47,7 @@ func Add(zone string, record Record) (status int, body []byte) {
 		//panic(err)
 	}
 	defer res.Body.Close()
-	body, err = ioutil.ReadAll(res.Body)
+	body, err = io.ReadAll(res.Body)
 	if err != nil {
 		panic(err)
 	}

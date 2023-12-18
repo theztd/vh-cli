@@ -3,7 +3,7 @@ package dns
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"ztd/vh-cli/config"
 )
@@ -47,7 +47,7 @@ func ListZones(zone string) map[string]interface{} {
 	}
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		panic(err)
 	}
