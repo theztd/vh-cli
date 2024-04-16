@@ -5,6 +5,8 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"text/template"
 	"ztd/vh-cli/vashosting/servers"
 
 	"github.com/spf13/cobra"
@@ -28,8 +30,37 @@ var serversList = &cobra.Command{
 	Long:    ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		name, _ := cmd.Flags().GetString("name")
+		tmplf, _ := cmd.Flags().GetString("template-file")
+		if tmplf != "" {
+			fmt.Println("Neon format")
+			tmplContent, err := os.ReadFile(tmplf)
+			if err != nil {
+				fmt.Println("Unable to read template file", err)
+				os.Exit(1)
+			}
+
+			tmplOut := template.New("").Funcs(template.FuncMap{
+				"Contains": func(data []string, search string) bool {
+					for _, s := range data {
+						if s == search {
+							return true
+						}
+					}
+					return false
+				},
+			})
+			tmplOut, err = tmplOut.Parse(string(tmplContent))
+			if err != nil {
+				fmt.Println("Unable to parse tempate", err)
+				os.Exit(1)
+			}
+
+			tmplOut.Execute(os.Stdout, servers.List(name))
+			os.Exit(0)
+		}
+
 		// clr := ""
-		for id, r := range servers.List(name) {
+		for id, r := range servers.ListJson(name) {
 			//fmt.Printf("%s - %+v\n", id, r)
 			// var clr string
 			// status := r["status"].(string)
@@ -59,6 +90,7 @@ func init() {
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	serversCmd.PersistentFlags().StringP("name", "n", "", "Server name")
+	serversCmd.PersistentFlags().StringP("template-file", "f", "", "Template file path")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
