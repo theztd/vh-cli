@@ -68,3 +68,8 @@ vh-cli servers reboot -n n1.fejk.net
 
 ```
 
+
+
+### Formatovani vystupu
+
+Je mozne, ze budete chtit pouzit nastroj pro generovani vystupu v konkretnim formatu. Pro tyto ucely je k dispozici prepinac --template-file ktery definuje cestu k souboru ve formatu go/templates, kterym lze vygenerovat libovolny vystup.
