@@ -32,7 +32,6 @@ var serversList = &cobra.Command{
 		name, _ := cmd.Flags().GetString("name")
 		tmplf, _ := cmd.Flags().GetString("template-file")
 		if tmplf != "" {
-			fmt.Println("Neon format")
 			tmplContent, err := os.ReadFile(tmplf) // #nosec G304
 			if err != nil {
 				fmt.Println("Unable to read template file", err)
