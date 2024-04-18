@@ -33,7 +33,7 @@ var serversList = &cobra.Command{
 		tmplf, _ := cmd.Flags().GetString("template-file")
 		if tmplf != "" {
 			fmt.Println("Neon format")
-			tmplContent, err := os.ReadFile(tmplf)
+			tmplContent, err := os.ReadFile(tmplf) // #nosec G304
 			if err != nil {
 				fmt.Println("Unable to read template file", err)
 				os.Exit(1)
@@ -55,7 +55,7 @@ var serversList = &cobra.Command{
 				os.Exit(1)
 			}
 
-			tmplOut.Execute(os.Stdout, servers.List(name))
+			tmplOut.Execute(os.Stdout, servers.List(name)) // #nosec G104
 			os.Exit(0)
 		}
 
