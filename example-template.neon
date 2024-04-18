@@ -1,12 +1,15 @@
 parameters:
     freelo:
         forbiddenIpRanges: [
-{{- range . -}}
-        {{- if Contains .Labels "infra" }}
+{{- range . }}
+
             # {{ .Name }}
             {{ range .IPv4 -}}
-            {{ . }}
-            {{- end -}}
-        {{- end -}}
+            {{ . }}/32
+            {{ end }}
+            {{ range .IPv6 -}}
+            {{ . }}/64
+            {{ end -}}
+
 {{ end }}
         ]
