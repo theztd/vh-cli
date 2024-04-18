@@ -77,12 +77,11 @@ func List(server string) map[string]ServerOut {
 		}
 
 		ipv6map, ok := d.Addresses["ipv6"].(map[string]interface{})
-		fmt.Println(ipv6map)
+		// fmt.Println(ipv6map)
 		if !ok {
 			fmt.Println(ok)
 		}
 		for ip6, _ := range ipv6map {
-
 			tmp.IPv6 = append(tmp.IPv6, ip6)
 		}
 		ret[name] = tmp
