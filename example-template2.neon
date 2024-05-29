@@ -1,0 +1,15 @@
+parameters:
+    freelo:
+        forbiddenIpRanges: [
+{{- range . -}}
+        {{- if Contains .Labels "" }}
+            # {{ .Name }}
+            {{ range .IPv4 -}}
+            {{ . }}
+            {{- end -}}
+            {{ range .IPv6 -}}
+            {{ . }}
+            {{- end -}}
+        {{- end -}}
+{{ end }}
+        ]

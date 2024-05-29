@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 	"text/template"
 	"ztd/vh-cli/vashosting/servers"
 
@@ -46,6 +47,9 @@ var serversList = &cobra.Command{
 						}
 					}
 					return false
+				},
+				"Replace": func(data string, before string, after string) string {
+					return strings.ReplaceAll(data, before, after)
 				},
 			})
 			tmplOut, err = tmplOut.Parse(string(tmplContent))

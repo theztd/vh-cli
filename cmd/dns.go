@@ -7,6 +7,8 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
+	"text/template"
 	"ztd/vh-cli/vashosting/dns"
 
 	"github.com/spf13/cobra"
@@ -26,15 +28,46 @@ var dnsListRecords = &cobra.Command{
 		kind, _ := cmd.Flags().GetString("type")
 		ttl, _ := cmd.Flags().GetInt("ttl")
 		value, _ := cmd.Flags().GetString("value")
+		tmplf, _ := cmd.Flags().GetString("template-file")
 		rec := dns.Record{
 			Name:    name,
 			Type:    kind,
 			TTL:     ttl,
 			Content: value,
 		}
-		for id, r := range dns.ListRecords(zone, rec) {
 
-			//fmt.Printf("%s - %+v\n", id, r)
+		if tmplf != "" {
+			tmplContent, err := os.ReadFile(tmplf) // #nosec G304
+			if err != nil {
+				fmt.Println("Unable to read template file", err)
+				os.Exit(1)
+			}
+
+			tmplOut := template.New("").Funcs(template.FuncMap{
+				"Contains": func(data []string, search string) bool {
+					for _, s := range data {
+						if s == search {
+							return true
+						}
+					}
+					return false
+				},
+				"Replace": func(data string, before string, after string) string {
+					return strings.ReplaceAll(data, before, after)
+				},
+			})
+			tmplOut, err = tmplOut.Parse(string(tmplContent))
+			if err != nil {
+				fmt.Println("Unable to parse tempate", err)
+				os.Exit(1)
+			}
+
+			tmplOut.Execute(os.Stdout, dns.ListRecords(zone, rec)) // #nosec G104
+			os.Exit(0)
+			// don't continue
+		}
+
+		for id, r := range dns.ListRecords(zone, rec) {
 			if outFmt == "csv" {
 				fmt.Printf("%s;%s;%s;%d;%s\n", id, r.Name, r.Type, r.TTL, r.Content)
 			} else {
@@ -150,6 +183,7 @@ func init() {
 	dnsCmd.PersistentFlags().StringP("value", "v", "", "DNS record value")
 	dnsCmd.PersistentFlags().IntP("prio", "p", 0, "DNS record priority")
 	dnsCmd.PersistentFlags().IntP("ttl", "T", 86400, "DNS record TTL")
+	dnsCmd.PersistentFlags().StringP("template-file", "f", "", "Template file path")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
