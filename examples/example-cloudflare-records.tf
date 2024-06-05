@@ -7,6 +7,7 @@ resource "cloudflare_record" "{{ .Type }}_{{ Replace .Name "." "_" }}" {
   type    = "{{ .Type }}"
   ttl     = {{ .TTL }}
   comment = "{{ . }}"
+  priority = {{ .Priority }}
   proxied = false
 }
 {{ end }}

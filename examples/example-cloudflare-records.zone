@@ -1,0 +1,5 @@
+{{- range . }}
+; {{ . }}
+{{ .Name }}    {{ .TTL }}  IN  {{ .Type }}  {{ if ne .Priority 0 }}{{ .Priority }}{{ end }} {{ .Content }} ; {{ . }}
+
+{{ end }}

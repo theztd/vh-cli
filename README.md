@@ -46,6 +46,9 @@ vh-cli zone list
 # Vypsani obsahu zony
 vh-cli dns list -z fejk.net
 
+# Vypsani obsahu zony dle sablony
+go run . dns l -z fejk.net -f ./examples/example-cloudflare-records.zone
+
 # Vytvoreni zaznamu
 vh-cli dns add -z fejk.net -t TXT -n pokus1 -v "Hodnota zaznamu" -c "Komentar"
 
