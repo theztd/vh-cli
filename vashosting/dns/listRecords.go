@@ -1,9 +1,14 @@
+/*
+Copyright © 2023 Marek Sirovy msirovy@gmail.com
+*/
 package dns
 
 import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"reflect"
+	"strings"
 	"ztd/vh-cli/config"
 )
 
@@ -15,7 +20,39 @@ type Record struct {
 	TTL      int    `json:"ttl"`
 }
 
-func ListRecords(zone string, record Record) (ret map[string]Record) {
+// Used only for filtering results
+type Filter struct {
+	Kind string
+	Name string
+}
+
+func filterDnsResults(data map[string]Record, filter Filter) (ret map[string]Record) {
+	/*
+		Filter results by name and kind
+	*/
+	ret = map[string]Record{}
+	for id, d := range data {
+		matchScore := 0
+		if filter.Kind == d.Type || filter.Kind == "" {
+			matchScore++
+		}
+		if strings.Contains(d.Name, filter.Name) || filter.Name == "" {
+			matchScore++
+		}
+
+		// Compare if amount of matchScore is same to number of items in the Filter structure
+		if matchScore == reflect.ValueOf(Filter{}).NumField() {
+			ret[string(id)] = d
+		}
+	}
+	return ret
+}
+
+func ListRecords(zone string, record Record, filter Filter) (ret map[string]Record) {
+	if config.DEBUG {
+		fmt.Println("Filter results by:", filter)
+	}
+
 	status, data := Request(
 		fmt.Sprintf("domains/%s/dns-records", zone),
 		"GET",
@@ -38,6 +75,5 @@ func ListRecords(zone string, record Record) (ret map[string]Record) {
 		return nil
 	}
 
-	return ret
-
+	return filterDnsResults(ret, filter)
 }

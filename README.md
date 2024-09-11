@@ -75,4 +75,47 @@ vh-cli servers reboot -n n1.fejk.net
 
 ### Formatovani vystupu
 
-Je mozne, ze budete chtit pouzit nastroj pro generovani vystupu v konkretnim formatu. Pro tyto ucely je k dispozici prepinac --template-file ktery definuje cestu k souboru ve formatu go/templates, kterym lze vygenerovat libovolny vystup.
+Je mozne, ze budete chtit pouzit nastroj pro generovani vystupu v konkretnim formatu. Pro tyto ucely je k dispozici prepinac --template-file ktery definuje cestu k souboru ve formatu go/templates, kterym lze vygenerovat libovolny vystup. Pro zvyseni uzitecnosti lze v templatech pouzivat tyto funkce:
+
+#### Contains
+vraci true pokud vstupni list dat obsahuje hledany string
+
+Priklad
+```go
+// Vytiskni jen polozky, ktere obsahuji label prod
+{{ if Contains .Labels "prod" }}
+{{ . }}
+{{ end }}
+```
+
+
+#### Replace
+nahradi ve vstupnich datech prvni vyskyt
+
+Priklad
+```go
+// Zmeni v promene .Name vyskyty -prod na -production
+{{ range . }}
+{{ Replace .Name "-prod" "-production" }}
+{{ end }}
+```
+
+
+#### ReplaceAll
+nahradi ve vstupnich datech vsechny vyskyty
+
+vstup
+```
+// nahradi vsechny vyskyty pismene "a" velkym pismenem "X"
+{{ ReplaceAll .Name "a" "X" }}
+```
+
+
+#### Join
+spoji pole definovanym delimiterem
+
+vstup
+```
+// Spoji Vsechny labely do vystupniho formatu "prod, wordpress, debian11"
+{{ Join .Labels ", " }}
+```

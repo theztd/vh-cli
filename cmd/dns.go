@@ -1,5 +1,5 @@
 /*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
+Copyright © 2023 Marek Sirovy msirovy@gmail.com
 */
 package cmd
 
@@ -7,8 +7,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"strings"
-	"text/template"
 	"ztd/vh-cli/vashosting/dns"
 
 	"github.com/spf13/cobra"
@@ -43,31 +41,12 @@ var dnsListRecords = &cobra.Command{
 				os.Exit(1)
 			}
 
-			tmplOut := template.New("").Funcs(template.FuncMap{
-				"Contains": func(data []string, search string) bool {
-					for _, s := range data {
-						if s == search {
-							return true
-						}
-					}
-					return false
-				},
-				"Replace": func(data string, before string, after string) string {
-					return strings.ReplaceAll(data, before, after)
-				},
-			})
-			tmplOut, err = tmplOut.Parse(string(tmplContent))
-			if err != nil {
-				fmt.Println("Unable to parse tempate", err)
-				os.Exit(1)
-			}
-
-			tmplOut.Execute(os.Stdout, dns.ListRecords(zone, rec)) // #nosec G104
+			RenderTemplate(string(tmplContent), dns.ListRecords(zone, rec, dns.Filter{Kind: kind, Name: name}), os.Stdout) // #nosec G104
 			os.Exit(0)
 			// don't continue
 		}
 
-		for id, r := range dns.ListRecords(zone, rec) {
+		for id, r := range dns.ListRecords(zone, rec, dns.Filter{Kind: kind, Name: name}) {
 			if outFmt == "csv" {
 				fmt.Printf("%s;%s;%s;%d;%s\n", id, r.Name, r.Type, r.TTL, r.Content)
 			} else {
@@ -130,7 +109,7 @@ Novy zaznam z DNS muze zmizet az po 15minutach
 			Content: value,
 		}
 
-		recordsForDeleting := dns.ListRecords(zone, rec)
+		recordsForDeleting := dns.ListRecords(zone, rec, dns.Filter{Kind: kind, Name: name})
 
 		if len(recordsForDeleting) == 0 {
 			fmt.Println("Neni co mazat.")

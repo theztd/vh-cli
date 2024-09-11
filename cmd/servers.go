@@ -1,13 +1,11 @@
 /*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
+Copyright © 2023 Marek Sirovy msirovy@gmail.com
 */
 package cmd
 
 import (
 	"fmt"
 	"os"
-	"strings"
-	"text/template"
 	"ztd/vh-cli/vashosting/servers"
 
 	"github.com/spf13/cobra"
@@ -21,6 +19,35 @@ var serversCmd = &cobra.Command{
 	Long:    ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println(cmd.Help())
+	},
+}
+
+var serversListJson = &cobra.Command{
+	Use:     "list-json",
+	Aliases: []string{"lj"},
+	Short:   "Vypise seznam serveru jako RAW json (tak jak ho dostane od API VH)",
+	Long:    ``,
+	Run: func(cmd *cobra.Command, args []string) {
+		name, _ := cmd.Flags().GetString("name")
+
+		for id, r := range servers.ListJson(name) {
+			//fmt.Printf("%s - %+v\n", id, r)
+			// var clr string
+			// status := r["status"].(string)
+			// switch status {
+			// case "A":
+			// 	clr = color.Blue
+			// case "CNAME":
+			// 	clr = color.Green
+			// case "TXT":
+			// 	clr = color.Yellow
+
+			// }
+			// fmt.Printf("%sID: %s - %+v %s\n", clr, id, r, color.Reset)
+
+			fmt.Printf("%s: %s\n", id, PrettyPrint(r))
+
+		}
 	},
 }
 
@@ -39,26 +66,7 @@ var serversList = &cobra.Command{
 				os.Exit(1)
 			}
 
-			tmplOut := template.New("").Funcs(template.FuncMap{
-				"Contains": func(data []string, search string) bool {
-					for _, s := range data {
-						if s == search {
-							return true
-						}
-					}
-					return false
-				},
-				"Replace": func(data string, before string, after string) string {
-					return strings.ReplaceAll(data, before, after)
-				},
-			})
-			tmplOut, err = tmplOut.Parse(string(tmplContent))
-			if err != nil {
-				fmt.Println("Unable to parse tempate", err)
-				os.Exit(1)
-			}
-
-			tmplOut.Execute(os.Stdout, servers.List(name)) // #nosec G104
+			RenderTemplate(string(tmplContent), servers.List(name), os.Stdout) // #nosec G104
 			os.Exit(0)
 		}
 
@@ -86,6 +94,7 @@ var serversList = &cobra.Command{
 
 func init() {
 	serversCmd.AddCommand(serversList)
+	serversCmd.AddCommand(serversListJson)
 	rootCmd.AddCommand(serversCmd)
 
 	// Here you will define your flags and configuration settings.

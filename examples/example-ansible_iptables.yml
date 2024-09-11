@@ -1,0 +1,7 @@
+{{ range $srv := . }}
+  {{- if Contains $srv.Labels "prod" -}}
+  {{- range $key, $ip := $srv.IPv4 }}
+  - -A INPUT -s {{ $ip }}/32 -J ACCEPT -m comment --comment "{{ $srv.DisplayName }} ({{ $srv.Name }}) {{ Join $srv.Labels "," }}"
+  {{- end -}}
+  {{- end -}}
+{{ end }}

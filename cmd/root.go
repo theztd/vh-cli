@@ -1,5 +1,5 @@
 /*
-Copyright © 2023 Marek Sirovy
+Copyright © 2023 Marek Sirovy msirovy@gmail.com
 */
 package cmd
 

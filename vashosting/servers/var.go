@@ -1,7 +1,8 @@
 package servers
 
 type Server struct {
-	Id        int `json:"id"`
+	Id        int    `json:"id"`
+	Name      string `json:"name"`
 	Addresses struct {
 		IPv4 struct {
 			Address map[string]interface{}

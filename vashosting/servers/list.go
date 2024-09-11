@@ -1,3 +1,6 @@
+/*
+Copyright © 2023 Marek Sirovy msirovy@gmail.com
+*/
 package servers
 
 import (
@@ -9,16 +12,17 @@ import (
 )
 
 type ServerOut struct {
-	ID        uint32 `json:"id"`
-	Name      string
-	Os        string                 `json:"operatingSystem"`
-	Addresses map[string]interface{} `json:"addresses"`
-	IPv4      []string
-	IPv6      []string
-	Labels    []string          `json:"labels"`
-	Storage   map[string]uint32 `json:"storage"`
-	Ram       int               `json:"ram"`
-	Status    string            `json:"status"`
+	ID          uint32 `json:"id"`
+	Name        string
+	DisplayName string                 `json:"displayName"`
+	Os          string                 `json:"operatingSystem"`
+	Addresses   map[string]interface{} `json:"addresses"`
+	IPv4        []string
+	IPv6        []string
+	Labels      []string          `json:"labels"`
+	Storage     map[string]uint32 `json:"storage"`
+	Ram         int               `json:"ram"`
+	Status      string            `json:"status"`
 }
 
 func List(server string) map[string]ServerOut {
@@ -64,7 +68,6 @@ func List(server string) map[string]ServerOut {
 
 	var data map[string]ServerOut
 	ret := map[string]ServerOut{}
-	//var data map[string]Record
 	if err := json.Unmarshal(body, &data); err != nil {
 		panic(err)
 	}
@@ -135,7 +138,6 @@ func ListJson(server string) map[string]interface{} {
 	}
 
 	var data map[string]interface{}
-	//var data map[string]Record
 	if err := json.Unmarshal(body, &data); err != nil {
 		panic(err)
 	}
