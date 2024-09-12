@@ -59,35 +59,43 @@ var serversList = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		name, _ := cmd.Flags().GetString("name")
 		tmplf, _ := cmd.Flags().GetString("template-file")
+		grpBy, _ := cmd.Flags().GetString("group-by")
+		filterLabels, _ := cmd.Flags().GetStringSlice("filter-labels")
+
 		if tmplf != "" {
 			tmplContent, err := os.ReadFile(tmplf) // #nosec G304
 			if err != nil {
 				fmt.Println("Unable to read template file", err)
 				os.Exit(1)
 			}
+			if grpBy != "" {
+				res := servers.GroupResultsBy(
+					servers.FilterServerByLabel(servers.List(name), filterLabels), grpBy)
+				RenderTemplate(string(tmplContent), res, os.Stdout) // #nosec G104
+			} else {
+				RenderTemplate(string(tmplContent), servers.List(name), os.Stdout) // #nosec G104
+			}
 
-			RenderTemplate(string(tmplContent), servers.List(name), os.Stdout) // #nosec G104
 			os.Exit(0)
 		}
 
-		// clr := ""
-		for id, r := range servers.ListJson(name) {
-			//fmt.Printf("%s - %+v\n", id, r)
-			// var clr string
-			// status := r["status"].(string)
-			// switch status {
-			// case "A":
-			// 	clr = color.Blue
-			// case "CNAME":
-			// 	clr = color.Green
-			// case "TXT":
-			// 	clr = color.Yellow
+		// Vystup bez sablony s groupovanim
+		if grpBy != "" {
+			res := servers.GroupResultsBy(
+				servers.FilterServerByLabel(servers.List(name), filterLabels), grpBy)
+			for key, servers := range res {
+				fmt.Printf("#######  %s   #######\n", key)
+				for _, s := range servers {
+					fmt.Println(s.ID, s.DisplayName, s.Name, s.HW, s.Status, s.Ram, s.IPv4, s.IPv6, s.Os, s.Storage, s.Labels)
+				}
 
-			// }
-			// fmt.Printf("%sID: %s - %+v %s\n", clr, id, r, color.Reset)
+			}
+			os.Exit(0)
+		}
 
+		res := servers.ListJson(name)
+		for id, r := range res {
 			fmt.Printf("%s: %s\n", id, PrettyPrint(r))
-
 		}
 	},
 }
@@ -103,6 +111,8 @@ func init() {
 	// and all subcommands, e.g.:
 	serversCmd.PersistentFlags().StringP("name", "n", "", "Server name")
 	serversCmd.PersistentFlags().StringP("template-file", "f", "", "Template file path")
+	serversCmd.PersistentFlags().StringP("group-by", "G", "", "Group results by")
+	serversCmd.PersistentFlags().StringSliceP("filter-labels", "", []string{}, "Filter results by label")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:

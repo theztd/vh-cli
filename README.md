@@ -3,9 +3,9 @@
 Command Line Interface pro Vas-Hosting management
 
 
-## Install
+## Installace
 
-Aplikace je napsana v jazyce GO, staci tedy jen stahnout vybuildenou binarku pro vas operacni system a zacit pouzivat.
+Aplikace je napsana v jazyce GO, staci tedy jen stahnout releasnutou binarku pro vas operacni system a zacit pouzivat.
 
 
 
@@ -46,7 +46,10 @@ vh-cli zone list
 # Vypsani obsahu zony
 vh-cli dns list -z fejk.net
 
-# Vypsani obsahu zony dle sablony
+# Vypsani obsahu zony s vyuzitim filtru
+vh-cli dns list -z fejk.net -t A -n dev 
+
+# Vypsani obsahu zony s pouzitim sablony
 go run . dns l -z fejk.net -f ./examples/example-cloudflare-records.zone
 
 # Vytvoreni zaznamu
@@ -62,6 +65,18 @@ vh-cli dns del -z fejk.net -n nazev-zaznamu -t TXT
 # Vypis seznamu serveru
 vh-cli servers list
 
+# Vypis seznamu serveru s vyuzitim sablon
+vh-cli servers list -f ./examples/example-ansible_iptables.yml
+
+# Vypis seznamu serveru s vyuzitim sablon a zgroupovany dle definovaneho klice
+vh-cli servers list -G hw -f ./examples/example-server_by_hw.html
+
+# Vypis seznamu serveru s vyuzitim sablon a zgroupovany dle definovaneho klice vyfiltrovany dle labelu prod
+go run . server list --filter-labels prod  -G hw -f examples/example-server_by_hw.html
+
+# Vypis seznamu serveru ve formatu jak je obdrzen od VH API
+vh-cli servers list-json
+
 # Vypis informaci ke konkretnimu serveru
 vh-cli servers list -n n1.fejk.net
 
@@ -71,7 +86,13 @@ vh-cli servers reboot -n n1.fejk.net
 
 ```
 
+### Debug mod
 
+Pokud nastavim env promenou DEBUG na true, aplikace vypisuje informace o svem behu, ktere mohou pomoci s hledanim potizi...
+
+```bash
+DEBUG=true vh-cli server list -G hw
+```
 
 ### Formatovani vystupu
 

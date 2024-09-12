@@ -1,0 +1,40 @@
+<HTML>
+    <head>
+        <style>
+            body {
+                font-family: Verdana, Geneva, Tahoma, sans-serif;
+                font-size: 1.2em;
+            }
+
+            .hw {
+                display: block;
+                padding: 15px;
+                border-style: dotted;
+                border-color: grey;
+                margin: 10px;
+            }
+            
+            .label {
+                display: inline-block;
+                border-radius: 5px;
+                padding: 3px;
+                margin: 5px;
+                font-size: 0.6em;
+                background-color: coral;
+                color: white;
+            }
+        </style>
+    </head>
+    <body>
+        {{ range $hw, $servers := . }}
+        <div class="hw">
+            <h3>{{ $hw }}</h3>
+            <ul>
+                {{ range $servers }}
+                <li>{{ .DisplayName }} ({{ .Name }}) {{ range .Labels }}<span class="label">{{ . }}</span>{{ end }}</li>
+                {{ end }}
+            </ul>
+        </div>
+        {{ end }}
+    </body>
+</HTML>

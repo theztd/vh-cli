@@ -7,7 +7,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"reflect"
+	"strings"
 	"ztd/vh-cli/config"
 )
 
@@ -23,6 +26,7 @@ type ServerOut struct {
 	Storage     map[string]uint32 `json:"storage"`
 	Ram         int               `json:"ram"`
 	Status      string            `json:"status"`
+	HW          string            `json:"dedicatedServerName"`
 }
 
 func List(server string) map[string]ServerOut {
@@ -91,7 +95,6 @@ func List(server string) map[string]ServerOut {
 		ret[name] = tmp
 
 	}
-
 	return ret
 
 }
@@ -144,4 +147,80 @@ func ListJson(server string) map[string]interface{} {
 
 	return data
 
+}
+
+func GroupResultsBy(data map[string]ServerOut, grpBy string) map[string][]ServerOut {
+	/*
+		Group results by key
+	*/
+
+	// Find correct group key name (I want to be able accept case insensitive parameter)
+	var groupByKey string
+	structKeys := reflect.TypeOf(ServerOut{})
+	for i := 0; i < structKeys.NumField(); i++ {
+		// compare strings case insensitive
+		if strings.EqualFold(structKeys.Field(i).Name, grpBy) {
+			groupByKey = structKeys.Field(i).Name
+		}
+	}
+
+	// When groupByKey is stay empty, the key is not in struct...
+	if groupByKey == "" {
+		fmt.Printf("Zadano nespravne, nebo neexistujici pole '%s'! Zkus nektery z existujicich klicu:\n", grpBy)
+		for i := 0; i < structKeys.NumField(); i++ {
+			f := structKeys.Field(i)
+			if f.Type.Kind() == reflect.String {
+				fmt.Println(" - ", f.Name)
+			}
+		}
+
+		return nil
+	} else {
+		if config.DEBUG {
+			fmt.Println("DEBUG [GroupResultsBy]: Groupuju dle klice", groupByKey)
+		}
+	}
+
+	newRet := map[string][]ServerOut{}
+	for _, srv := range data {
+		key := reflect.ValueOf(srv).FieldByName(groupByKey)
+		newRet[key.String()] = append(newRet[key.String()], srv)
+
+	}
+	return newRet
+}
+
+func FilterServerByLabel(data map[string]ServerOut, filterLabels []string) (ret map[string]ServerOut) {
+	/*
+		Filter results by name and kind
+	*/
+	if config.DEBUG {
+		log.Println("DEBUG [FilterServerByLabel]: Filter by labels", filterLabels)
+	}
+	ret = map[string]ServerOut{}
+	for id, d := range data {
+		matchScore := 0
+
+		// Iterate over servr labels and check if given filterLabels match all of them
+		for _, srvlabel := range d.Labels {
+			for _, testLabel := range filterLabels {
+				if strings.Contains(testLabel, srvlabel) {
+					matchScore++
+				}
+			}
+		}
+
+		// Compare if amount of matchScore is same to number of items in the Filter structure
+		if matchScore == len(filterLabels) {
+			if config.DEBUG {
+				log.Println("DEBUG [FilterServerByLabel]: Server", d.Name, "with labels ", d.Labels, "has been appended because contains required labels.")
+			}
+			ret[string(id)] = d
+		} else {
+			if config.DEBUG {
+				log.Println("DEBUG [FilterServerByLabel]: Skip server", d.Name)
+			}
+		}
+	}
+	return ret
 }
