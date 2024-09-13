@@ -18,7 +18,7 @@ export VH_API_KEY="Tajny-Vygenerovany-Token"
 export VH_URL="https://centrum.vas-hosting.cz/api/v1/"
 ```
 
-Pripadne lze vytvorit soubor $HOME/.vh/config.ini s obsahem
+Pripadne lze vytvorit soubor $HOME/.vh/config.env s obsahem
 
 ```toml
 [default]
@@ -26,6 +26,8 @@ VH_URL="https://centrum.vas-hosting.cz/api/v1/"
 VH_API_KEY=Vygenerovany-Token
 
 ```
+
+Nebo lze cestu ke konfiguracnimu souboru definovat take prez promenou **VH_CONFIG_PATH**
 
 ## Pouziti
 
