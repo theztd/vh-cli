@@ -9,6 +9,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"reflect"
 	"strings"
 	"ztd/vh-cli/config"
@@ -73,7 +74,13 @@ func List(server string) map[string]ServerOut {
 	var data map[string]ServerOut
 	ret := map[string]ServerOut{}
 	if err := json.Unmarshal(body, &data); err != nil {
-		panic(err)
+		if config.DEBUG {
+			fmt.Printf("\nDEBUG [vashosting.servers.List]: %s\n\n", body)
+			panic(err)
+		}
+		fmt.Printf("Broken response from API: %s\n", body)
+		os.Exit(1)
+
 	}
 
 	for name, d := range data {
