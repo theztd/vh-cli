@@ -28,7 +28,7 @@ func GetEnv(val string, def string) string {
 	return def
 }
 
-func Init() {
+func Init() error {
 	// Nejdriv se zkusi vzit config z lokalni cesty
 	// a pokud neexistuje, vezme se ten z home
 	cfgFile := GetEnv(os.Getenv("VH_CONFIG_PATH"), "~/.vh/config.env")
@@ -57,8 +57,10 @@ func Init() {
 		// API key nema default
 		VH_API_KEY = GetEnv(os.Getenv("VH_API_KEY"), cfg["VH_API_KEY"])
 
+		return nil
+
 	} else {
 		fmt.Println("Fatal: Unable to read config file... ", cfgFile, err)
-		os.Exit(1)
+		return err
 	}
 }

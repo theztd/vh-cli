@@ -10,9 +10,9 @@ import (
 )
 
 func main() {
-	config.Init()
 	if config.DEBUG {
 		log.Println("Running in debug mode...🔎")
 	}
+	config.Init()
 	cmd.Execute()
 }
